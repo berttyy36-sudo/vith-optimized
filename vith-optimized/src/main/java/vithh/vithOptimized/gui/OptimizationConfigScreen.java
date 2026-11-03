@@ -1,6 +1,5 @@
 package vithh.vithOptimized.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,10 +32,10 @@ public class OptimizationConfigScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        rebuildWidgets();
+        buildSettingsUI();
     }
 
-    private void rebuildWidgets() {
+    private void buildSettingsUI() {
         this.clearWidgets();
 
         int tabWidth = Math.min(100, (this.width - 40) / TAB_NAMES.length);
@@ -48,19 +47,19 @@ public class OptimizationConfigScreen extends Screen {
             String label = (currentTab == tabIdx ? "> " : "") + TAB_NAMES[i];
             this.addRenderableWidget(Button.builder(Component.literal(label), btn -> {
                 currentTab = tabIdx;
-                rebuildWidgets();
-            }).bounds(tabStartX + i * tabWidth, 28, tabWidth - 2, 20).build());
+                buildSettingsUI();
+            }).bounds(tabStartX + i * tabWidth, 20, tabWidth - 2, 20).build());
         }
 
         int colWidth = Math.min(170, (this.width - 60) / 2);
         int leftX = (this.width / 2) - colWidth - 6;
         int rightX = (this.width / 2) + 6;
-        int startY = 56;
+        int startY = 48;
         int rowHeight = 24;
 
         if (currentTab == 0) {
             addToggleWidget(leftX, startY, colWidth, "Multi-Threading CPU", () -> config.multiThreading, val -> config.multiThreading = val);
-            addSliderWidget(rightX, startY, colWidth, "Threads", config.threadCount, 2, 32, 1, val -> config.threadCount = (int) val);
+            addSliderWidget(rightX, startY, colWidth, "Threads", config.threadCount, 2, 32, 1, val -> config.threadCount = (int) (double) val);
 
             addToggleWidget(leftX, startY + rowHeight, colWidth, "P-Core Affinity", () -> config.cpuPriority, val -> config.cpuPriority = val);
             addToggleWidget(rightX, startY + rowHeight, colWidth, "100% Saturation", () -> config.maxThreadSaturation, val -> config.maxThreadSaturation = val);
@@ -77,7 +76,7 @@ public class OptimizationConfigScreen extends Screen {
             addSliderWidget(leftX, startY + rowHeight * 2, colWidth, "BE Dist", config.blockEntityDistance, 16, 96, 4, val -> config.blockEntityDistance = val);
             addToggleWidget(rightX, startY + rowHeight * 2, colWidth, "Particle Culling", () -> config.particleCulling, val -> config.particleCulling = val);
 
-            addSliderWidget(leftX, startY + rowHeight * 3, colWidth * 2 + 12, "Max Particles", config.maxParticles, 50, 2000, 50, val -> config.maxParticles = (int) val);
+            addSliderWidget(leftX, startY + rowHeight * 3, colWidth * 2 + 12, "Max Particles", config.maxParticles, 50, 2000, 50, val -> config.maxParticles = (int) (double) val);
         } else if (currentTab == 2) {
             addToggleWidget(leftX, startY, colWidth, "Universal Frame Gen 2x", () -> config.frameGeneration, val -> config.frameGeneration = val);
             addSliderWidget(rightX, startY, colWidth, "Motion Sharpness", config.frameGenSharpness, 0.0, 2.0, 0.1, val -> config.frameGenSharpness = val);
@@ -100,13 +99,13 @@ public class OptimizationConfigScreen extends Screen {
             addToggleWidget(leftX, startY + rowHeight * 3, colWidth * 2 + 12, "GC Freeze Shield", () -> config.gcStabilizer, val -> config.gcStabilizer = val);
         }
 
-        int bottomY = this.height - 30;
+        int bottomY = this.height - 28;
         int actionBtnWidth = Math.min(140, (this.width - 40) / 2);
 
         this.addRenderableWidget(Button.builder(Component.literal("Reset Defaults"), btn -> {
             config.resetToDefaults();
             applyAndSync();
-            rebuildWidgets();
+            buildSettingsUI();
         }).bounds((this.width / 2) - actionBtnWidth - 6, bottomY, actionBtnWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.literal("Done"), btn -> {
@@ -167,16 +166,10 @@ public class OptimizationConfigScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 10, 0xFFFFFF);
-    }
-
-    @Override
     public void onClose() {
         applyAndSync();
         if (this.minecraft != null) {
-            this.minecraft.setScreen(this.parent);
+            this.minecraft.setScreenAndShow(this.parent);
         }
     }
 }
