@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "vith-optimized",
+  "version": "${version}",
+  "name": "Vith Optimized",
+  "description": "High-performance standalone optimization engine featuring CPU multi-threading, AVX2 SIMD acceleration, aggressive culling, and optical flow frame generation.",
+  "authors": [
+    "Vith Team"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/vith-optimized/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "vithh.vithOptimized.VithOptimized"
+    ],
+    "client": [
+      "vithh.vithOptimized.VithOptimizedClient"
+    ],
+    "modmenu": [
+      "vithh.vithOptimized.gui.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "vith-optimized.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
