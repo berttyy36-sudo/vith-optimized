@@ -8,6 +8,7 @@ import org.lwjgl.opengl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vithh.vithOptimized.config.OptimizationConfig;
+import vithh.vithOptimized.nativeopt.NativeAccelerator;
 import vithh.vithOptimized.render.IMinecraftAccessor;
 import vithh.vithOptimized.render.RenderResetHelper;
 import vithh.vithOptimized.render.shader.QuadHelper;
@@ -39,6 +40,9 @@ public final class UniversalFrameGenerator {
     private static boolean hasValidPrevFrame = false;
     private static boolean statsLogged = false;
 
+    private static final ThreadLocal<float[]> MATRIX_IN_BUFFER = ThreadLocal.withInitial(() -> new float[16]);
+    private static final ThreadLocal<float[]> MATRIX_OUT_BUFFER = ThreadLocal.withInitial(() -> new float[16]);
+
     private UniversalFrameGenerator() {}
 
     public static void updateCameraMatrix(Matrix4f viewProj) {
@@ -49,6 +53,16 @@ public final class UniversalFrameGenerator {
         }
         currViewProj.set(viewProj);
         try {
+            OptimizationConfig config = OptimizationConfig.getInstance();
+            if (config.rustMatrixPipeline && NativeAccelerator.isRustAvailable()) {
+                float[] inM = MATRIX_IN_BUFFER.get();
+                float[] outM = MATRIX_OUT_BUFFER.get();
+                viewProj.get(inM);
+                if (NativeAccelerator.rustMatrix4fInvert(inM, outM)) {
+                    currInvViewProj.set(outM);
+                    return;
+                }
+            }
             currInvViewProj.set(viewProj).invert();
         } catch (Throwable ignored) {}
     }

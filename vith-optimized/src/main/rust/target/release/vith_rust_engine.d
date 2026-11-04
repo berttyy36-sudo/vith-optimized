@@ -1,1 +1,1 @@
-C:\Users\bertt\Desktop\Новая\ папка\ (5)\vith-26.2\src\main\rust\target\release\vith_rust_engine.dll: C:\Users\bertt\Desktop\Новая\ папка\ (5)\vith-26.2\src\main\rust\src\lib.rs
+C:\Users\bertt\Desktop\vith\ optimized\vith\ optimized\src\main\rust\target\release\vith_rust_engine.dll: C:\Users\bertt\Desktop\vith\ optimized\vith\ optimized\src\main\rust\src\lib.rs

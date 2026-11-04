@@ -39,10 +39,16 @@ public final class EntityCuller {
 
         double maxDist = config.entityDistance;
         double maxDistSq = maxDist * maxDist;
-        double distSq = FastMath.distanceSq(entity.getX(), entity.getY(), entity.getZ(), camX, camY, camZ);
 
-        if (distSq > maxDistSq) {
-            return true;
+        if (config.rustEngine && NativeAccelerator.isRustAvailable()) {
+            if (NativeAccelerator.rustShouldCullDistance(entity.getX(), entity.getY(), entity.getZ(), camX, camY, camZ, maxDistSq)) {
+                return true;
+            }
+        } else {
+            double distSq = FastMath.distanceSq(entity.getX(), entity.getY(), entity.getZ(), camX, camY, camZ);
+            if (distSq > maxDistSq) {
+                return true;
+            }
         }
 
         if (config.cullInvisible) {
@@ -58,8 +64,13 @@ public final class EntityCuller {
                 }
             }
 
-            if ((entity instanceof ItemEntity || entity instanceof ExperienceOrb) && distSq > (24.0 * 24.0)) {
-                return true;
+            if (entity instanceof ItemEntity || entity instanceof ExperienceOrb) {
+                double distSq = (config.rustEngine && NativeAccelerator.isRustAvailable())
+                        ? NativeAccelerator.rustDistanceSq(entity.getX(), entity.getY(), entity.getZ(), camX, camY, camZ)
+                        : FastMath.distanceSq(entity.getX(), entity.getY(), entity.getZ(), camX, camY, camZ);
+                if (distSq > (24.0 * 24.0)) {
+                    return true;
+                }
             }
         }
 

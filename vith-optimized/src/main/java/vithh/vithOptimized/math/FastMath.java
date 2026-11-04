@@ -46,4 +46,12 @@ public final class FastMath {
         double dz = z1 - z2;
         return dx * dx + dz * dz;
     }
+
+    public static void batchSinCos(float[] inAngles, int count, float[] outSin, float[] outCos) {
+        vithh.vithOptimized.nativeopt.NativeAccelerator.rustBatchSinCos(inAngles, count, outSin, outCos);
+    }
+
+    public static void batchFastInvSqrt(float[] inValues, int count, float[] outValues) {
+        vithh.vithOptimized.nativeopt.NativeAccelerator.rustFastInvSqrtBatch(inValues, count, outValues);
+    }
 }

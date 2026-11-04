@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BlockEntityRenderDispatcherMixin",
+    "ClientLevelMixin",
     "EntityFluidInteractionMixin",
     "GlStateManagerAccessor",
     "GlSurfaceMixin",

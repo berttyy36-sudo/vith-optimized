@@ -45,6 +45,11 @@ public class OptimizationConfig {
     public double frameGenSharpness = 1.0;
     public boolean frameGenDisocclusion = true;
     public boolean gcStabilizer = true;
+    public boolean rustMatrixPipeline = true;
+    public boolean rustFrustumCulling = true;
+    public boolean rustFastLightmap = true;
+    public boolean entityTickCulling = true;
+    public String language = "en";
 
     public static OptimizationConfig getInstance() {
         if (INSTANCE == null) {
@@ -60,6 +65,9 @@ public class OptimizationConfig {
                 if (loaded != null) {
                     if (loaded.threadCount < 2) {
                         loaded.threadCount = Math.max(2, Runtime.getRuntime().availableProcessors());
+                    }
+                    if (loaded.language == null || loaded.language.trim().isEmpty()) {
+                        loaded.language = "en";
                     }
                     return loaded;
                 }
@@ -113,6 +121,13 @@ public class OptimizationConfig {
         frameGenSharpness = 1.0;
         frameGenDisocclusion = true;
         gcStabilizer = true;
+        rustMatrixPipeline = true;
+        rustFrustumCulling = true;
+        rustFastLightmap = true;
+        entityTickCulling = true;
+        if (language == null || language.trim().isEmpty()) {
+            language = "en";
+        }
         save();
     }
 }

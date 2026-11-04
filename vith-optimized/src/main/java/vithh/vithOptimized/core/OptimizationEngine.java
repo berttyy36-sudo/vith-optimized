@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import vithh.vithOptimized.config.OptimizationConfig;
 import vithh.vithOptimized.culling.EntityCuller;
 import vithh.vithOptimized.math.FastMath;
+import vithh.vithOptimized.nativeopt.NativeAccelerator;
 import vithh.vithOptimized.render.framegen.UniversalFrameGenerator;
 import vithh.vithOptimized.threading.ParallelExecutor;
 
@@ -42,7 +43,7 @@ public final class OptimizationEngine {
         applyThreadingConfig();
         applyGpuConfig();
         applyChunkConfig();
-        LOGGER.info("OptimizationEngine initialized successfully with all optimizations enabled.");
+        LOGGER.info("OptimizationEngine initialized successfully with all optimizations enabled (Rust Engine Active: {}).", NativeAccelerator.isRustAvailable());
     }
 
     public OptimizationConfig getConfig() {
@@ -130,8 +131,12 @@ public final class OptimizationEngine {
 
         double maxDist = config.blockEntityDistance;
         double maxDistSq = maxDist * maxDist;
-        double distSq = FastMath.distanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, camPos.x, camPos.y, camPos.z);
 
+        if (config.rustEngine && NativeAccelerator.isRustAvailable()) {
+            return NativeAccelerator.rustShouldCullDistance(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, camPos.x, camPos.y, camPos.z, maxDistSq);
+        }
+
+        double distSq = FastMath.distanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, camPos.x, camPos.y, camPos.z);
         return distSq > maxDistSq;
     }
 
@@ -147,8 +152,12 @@ public final class OptimizationEngine {
         if (mc.gameRenderer == null || mc.gameRenderer.mainCamera() == null) return false;
         Vec3 camPos = mc.gameRenderer.mainCamera().position();
         if (camPos != null) {
+            double maxDistSq = 36.0 * 36.0;
+            if (config.rustEngine && NativeAccelerator.isRustAvailable()) {
+                return NativeAccelerator.rustShouldCullDistance(x, y, z, camPos.x, camPos.y, camPos.z, maxDistSq);
+            }
             double distSq = FastMath.distanceSq(x, y, z, camPos.x, camPos.y, camPos.z);
-            if (distSq > (36.0 * 36.0)) {
+            if (distSq > maxDistSq) {
                 return true;
             }
         }
